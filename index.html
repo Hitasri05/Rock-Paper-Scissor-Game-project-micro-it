@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🎮 Rock Paper Scissors - Fun Edition 🎮</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+  body {
+    margin: 0;
+    background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    text-align: center;
+    padding: 50px 20px;
+    user-select: none;
+  }
+
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 40px;
+    text-shadow: 0 0 10px #4fc3f7;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+
+  button {
+    background: #1c1f26;
+    border: 3px solid #4fc3f7;
+    border-radius: 15px;
+    width: 120px;
+    height: 120px;
+    font-size: 3.5rem;
+    cursor: pointer;
+    color: #4fc3f7;
+    box-shadow: 0 5px 15px #1c1f26aa;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  button:hover {
+    background: #4fc3f7;
+    color: #0f2027;
+    box-shadow: 0 10px 25px #4fc3f7;
+    transform: scale(1.15) rotate(10deg);
+  }
+
+  button:active {
+    transform: scale(0.9) rotate(-5deg);
+    box-shadow: 0 3px 10px #4fc3f7;
+  }
+
+  #result {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    min-height: 50px;
+    padding: 15px 30px;
+    border-radius: 12px;
+    background-color: #222a38cc;
+    box-shadow: 0 0 10px #4fc3f7;
+    transition: background-color 0.5s ease;
+  }
+
+  .scoreboard {
+    font-size: 1.6rem;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+  }
+
+  .score {
+    background: #11181fcc;
+    padding: 15px 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px #4fc3f7;
+    min-width: 150px;
+  }
+
+  .score span {
+    display: block;
+    font-weight: 700;
+    font-size: 2.4rem;
+    margin-top: 5px;
+  }
+
+  .reset-btn {
+    background: #f44336;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.4rem;
+    color: white;
+    font-weight: 700;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 6px 15px #f44336aa;
+    transition: background-color 0.3s ease;
+  }
+
+  .reset-btn:hover {
+    background-color: #d32f2f;
+    box-shadow: 0 8px 20px #d32f2faa;
+  }
+
+  /* Flash effect on result */
+  .win {
+    background-color: #28a745cc !important;
+    box-shadow: 0 0 20px #28a745;
+    animation: flashGreen 1s ease;
+  }
+
+  .lose {
+    background-color: #dc3545cc !important;
+    box-shadow: 0 0 20px #dc3545;
+    animation: flashRed 1s ease;
+  }
+
+  .tie {
+    background-color: #ffc107cc !important;
+    box-shadow: 0 0 20px #ffc107;
+    animation: flashYellow 1s ease;
+  }
+
+  @keyframes flashGreen {
+    0%, 100% {background-color: #28a745cc;}
+    50% {background-color: #2ecc7122;}
+  }
+
+  @keyframes flashRed {
+    0%, 100% {background-color: #dc3545cc;}
+    50% {background-color: #e74c3c22;}
+  }
+
+  @keyframes flashYellow {
+    0%, 100% {background-color: #ffc107cc;}
+    50% {background-color: #ffec7322;}
+  }
+
+  /* Confetti container */
+  #confetti-container {
+    position: fixed;
+    pointer-events: none;
+    top: 0; left: 0; width: 100%; height: 100%;
+    overflow: visible;
+    z-index: 9999;
+  }
+
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #4fc3f7;
+    opacity: 0.9;
+    animation: confetti-fall 3s linear forwards;
+    border-radius: 3px;
+  }
+
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>🎮 Rock Paper Scissors - Fun Edition 🎮</h1>
+
+<div class="buttons">
+  <button aria-label="Rock" onclick="play('rock')">✊</button>
+  <button aria-label="Paper" onclick="play('paper')">🖐️</button>
+  <button aria-label="Scissors" onclick="play('scissors')">✌️</button>
+</div>
+
+<div id="result">Make your move!</div>
+
+<div class="scoreboard">
+  <div class="score">👤 You<br><span id="userScore">0</span></div>
+  <div class="score">💻 Computer<br><span id="compScore">0</span></div>
+</div>
+
+<button class="reset-btn" onclick="resetGame()">🔄 Reset Game</button>
+
+<div id="confetti-container"></div>
+
+<script>
+  let userScore = 0;
+  let compScore = 0;
+
+  const resultEl = document.getElementById('result');
+  const userScoreEl = document.getElementById('userScore');
+  const compScoreEl = document.getElementById('compScore');
+  const confettiContainer = document.getElementById('confetti-container');
+
+  function play(userChoice) {
+    const choices = ["rock", "paper", "scissors"];
+    const compChoice = choices[Math.floor(Math.random() * 3)];
+
+    let resultText = "";
+    let resultClass = "";
+
+    if (userChoice === compChoice) {
+      resultText = `🤝 It's a tie! Both chose ${userChoice}.`;
+      resultClass = "tie";
+    } else if (
+      (userChoice === "rock" && compChoice === "scissors") ||
+      (userChoice === "scissors" && compChoice === "paper") ||
+      (userChoice === "paper" && compChoice === "rock")
+    ) {
+      resultText = `🎉 You win! ${capitalize(userChoice)} beats ${capitalize(compChoice)}!`;
+      userScore++;
+      resultClass = "win";
+      launchConfetti();
+    } else {
+      resultText = `💻 Computer wins! ${capitalize(compChoice)} beats ${capitalize(userChoice)}!`;
+      compScore++;
+      resultClass = "lose";
+    }
+
+    userScoreEl.textContent = userScore;
+    compScoreEl.textContent = compScore;
+    updateResult(resultText, resultClass);
+  }
+
+  function updateResult(text, cls) {
+    resultEl.textContent = text;
+    resultEl.className = '';
+    void resultEl.offsetWidth; // Trigger reflow for animation restart
+    resultEl.classList.add(cls);
+  }
+
+  function resetGame() {
+    userScore = 0;
+    compScore = 0;
+    userScoreEl.textContent = userScore;
+    compScoreEl.textContent = compScore;
+    resultEl.textContent = "Make your move!";
+    resultEl.className = '';
+  }
+
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  // Confetti animation on win
+  function launchConfetti() {
+    const colors = ['#4fc3f7', '#81d4fa', '#0288d1', '#b3e5fc'];
+    for (let i = 0; i < 30; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.left = Math.random() * window.innerWidth + 'px';
+      confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+      confetti.style.width = confetti.style.height = (5 + Math.random() * 10) + 'px';
+      confettiContainer.appendChild(confetti);
+
+      setTimeout(() => {
+        confetti.remove();
+      }, 3000);
+    }
+  }
+</script>
+
+</body>
+</html>
